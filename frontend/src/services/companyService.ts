@@ -25,11 +25,12 @@ interface PaginatedResponse {
 }
 
 export const companyService = {
-  getAll: async (page = 1, size = 10): Promise<PaginatedResponse> => {
+  getAll: async (page = 1, size = 10, search = ''): Promise<PaginatedResponse> => {
     const response = await axios.get(`${API_URL}/companies/`, {
       params: {
         page,
-        size
+        size,
+        search
       }
     })
     return response.data

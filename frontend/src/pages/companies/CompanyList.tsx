@@ -22,14 +22,18 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
-  useToast
+  useToast,
+  Input,
+  InputGroup,
+  InputLeftElement
 } from "@chakra-ui/react"
-import { EditIcon, DeleteIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons"
+import { EditIcon, DeleteIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { companyService } from "../../services/companyService"
 import CompanyModal from "./CompanyModal"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import React from "react"
+import { useDebounce } from "../../hooks/useDebounce"
 
 interface Company {
   id: number
@@ -66,13 +70,15 @@ const CompanyList = () => {
   const [mode, setMode] = useState<'create' | 'edit'>('create')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 500) // 500ms delay
   const cancelRef = React.useRef<HTMLButtonElement>(null)
   const toast = useToast()
   const queryClient = useQueryClient()
 
   const { data, isLoading, isError } = useQuery<PaginatedResponse>({
-    queryKey: ['companies', page, pageSize],
-    queryFn: () => companyService.getAll(page, pageSize)
+    queryKey: ['companies', page, pageSize, debouncedSearchTerm],
+    queryFn: () => companyService.getAll(page, pageSize, debouncedSearchTerm)
   })
 
   const deleteMutation = useMutation({
@@ -130,6 +136,16 @@ const CompanyList = () => {
     setPage(1) // Reset to first page when changing page size
   }
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value)
+    // Remove the immediate page reset - it will happen when the debounced value changes
+  }
+
+  // Reset page when debounced search term changes
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearchTerm])
+
   if (isLoading) {
     return (
       <Center h="200px">
@@ -154,6 +170,23 @@ const CompanyList = () => {
           New Company
         </Button>
       </HStack>
+
+      {/* Search Bar */}
+      <Box mb={6}>
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search companies..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            borderColor="gray.300"
+            _hover={{ borderColor: "gray.400" }}
+            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
+          />
+        </InputGroup>
+      </Box>
 
       <Table variant="simple">
         <Thead>
