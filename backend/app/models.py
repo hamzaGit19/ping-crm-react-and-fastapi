@@ -48,9 +48,15 @@ class Contact(Base):
     __tablename__ = "contacts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, index=True)
+    first_name: Mapped[str] = mapped_column(String, index=True)
+    last_name: Mapped[str] = mapped_column(String, index=True)
+    email: Mapped[str] = mapped_column(String)
     phone: Mapped[str] = mapped_column(String)
+    address: Mapped[str] = mapped_column(String)
     city: Mapped[str] = mapped_column(String)
+    province: Mapped[str] = mapped_column(String)
+    country: Mapped[str] = mapped_column(String)
+    postal_code: Mapped[str] = mapped_column(String)
     company_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("companies.id"), nullable=True
     )
