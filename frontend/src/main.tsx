@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import theme from "./theme"
 import App from "./App"
+import CompanyList from "./pages/companies/CompanyList"
 
 // Create a client
 const queryClient = new QueryClient({
@@ -20,7 +21,13 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-  },
+    children: [
+      {
+        path: "companies",
+        element: <CompanyList />
+      }
+    ]
+  }
 ])
 
 const root = document.getElementById("root")
