@@ -2,8 +2,9 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import select
-from app.database import get_db
+from app.database import get_db, engine, Base
 from app.models import User
+from app.api.v1 import contacts
 
 # from sqlalchemy import text
 # from app.database import get_db
@@ -22,6 +23,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+app.include_router(contacts.router, prefix="/api/v1/contacts", tags=["contacts"])
 
 
 @app.get("/")
