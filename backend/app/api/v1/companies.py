@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, func
 from typing import List, Optional
 from app.database import get_db
@@ -69,7 +69,7 @@ async def create_company(company: CompanyCreate, db: Session = Depends(get_db)):
 
 @router.get("/{company_id}", response_model=CompanySchema)
 async def get_company(company_id: int, db: Session = Depends(get_db)):
-    company = db.get(Company, company_id)
+    company = db.get(Company, company_id, options=[joinedload(Company.contacts)])
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     return company

@@ -25,37 +25,18 @@ import {
   useToast,
   Input,
   InputGroup,
-  InputLeftElement
+  InputLeftElement,
+  Tooltip
 } from "@chakra-ui/react"
-import { EditIcon, DeleteIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons"
+import { EditIcon, DeleteIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { companyService } from "../../services/companyService"
 import CompanyModal from "./CompanyModal"
 import { useState, useEffect } from "react"
 import React from "react"
 import { useDebounce } from "../../hooks/useDebounce"
-
-interface Company {
-  id: number
-  name: string
-  email: string
-  phone: string
-  address: string
-  city: string
-  province: string
-  country: string
-  postal_code: string
-  created_at: string
-  updated_at: string
-}
-
-interface PaginatedResponse {
-  items: Company[]
-  total: number
-  page: number
-  size: number
-  pages: number
-}
+import { CompanySideRail } from "../../components/CompanySideRail"
+import type { Company, PaginatedResponse } from "../../services/companyService"
 
 const PAGE_SIZES = [10, 20, 30, 50]
 
@@ -75,8 +56,9 @@ const CompanyList = () => {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
   const toast = useToast()
   const queryClient = useQueryClient()
+  const [selectedViewCompany, setSelectedViewCompany] = useState<number | null>(null)
 
-  const { data, isLoading, isError } = useQuery<PaginatedResponse>({
+  const { data, isLoading, isError } = useQuery<PaginatedResponse<Company>>({
     queryKey: ['companies', page, pageSize, debouncedSearchTerm],
     queryFn: () => companyService.getAll(page, pageSize, debouncedSearchTerm)
   })
@@ -146,6 +128,14 @@ const CompanyList = () => {
     setPage(1)
   }, [debouncedSearchTerm])
 
+  const handleViewDetails = (companyId: number) => {
+    setSelectedViewCompany(companyId)
+  }
+
+  const handleCloseSideRail = () => {
+    setSelectedViewCompany(null)
+  }
+
   if (isLoading) {
     return (
       <Center h="200px">
@@ -163,7 +153,7 @@ const CompanyList = () => {
   }
 
   return (
-    <Box bg="white" rounded="lg" shadow="md" p={6}>
+    <Box bg="white" rounded="lg" shadow="md" p={6} position="relative">
       <HStack justify="space-between" mb={6}>
         <Heading size="lg">Companies</Heading>
         <Button colorScheme="blue" onClick={handleCreate}>
@@ -210,19 +200,31 @@ const CompanyList = () => {
               <Td>{company.province}</Td>
               <Td>{company.country}</Td>
               <Td>
-                <ButtonGroup size="sm" spacing={2}>
-                  <IconButton
-                    aria-label="Edit company"
-                    icon={<EditIcon />}
-                    colorScheme="blue"
-                    onClick={() => handleEdit(company)}
-                  />
-                  <IconButton
-                    aria-label="Delete company"
-                    icon={<DeleteIcon />}
-                    colorScheme="red"
-                    onClick={() => handleDelete(company)}
-                  />
+                <ButtonGroup size="sm" variant="ghost">
+                  <Tooltip label="View Details">
+                    <IconButton
+                      aria-label="View company details"
+                      icon={<ViewIcon />}
+                      onClick={() => handleViewDetails(company.id)}
+                      colorScheme="blue"
+                    />
+                  </Tooltip>
+                  <Tooltip label="Edit">
+                    <IconButton
+                      aria-label="Edit company"
+                      icon={<EditIcon />}
+                      onClick={() => handleEdit(company)}
+                      colorScheme="green"
+                    />
+                  </Tooltip>
+                  <Tooltip label="Delete">
+                    <IconButton
+                      aria-label="Delete company"
+                      icon={<DeleteIcon />}
+                      onClick={() => handleDelete(company)}
+                      colorScheme="red"
+                    />
+                  </Tooltip>
                 </ButtonGroup>
               </Td>
             </Tr>
@@ -305,6 +307,12 @@ const CompanyList = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      {/* Company Side Rail */}
+      <CompanySideRail
+        companyId={selectedViewCompany}
+        onClose={handleCloseSideRail}
+      />
     </Box>
   )
 }
