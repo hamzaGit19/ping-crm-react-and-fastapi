@@ -16,14 +16,28 @@ interface Company {
   updated_at?: string
 }
 
+interface PaginatedResponse {
+  items: Company[]
+  total: number
+  page: number
+  size: number
+  pages: number
+}
+
 export const companyService = {
-  getAll: async () => {
-    const response = await axios.get(`${API_URL}/companies/`)
+  getAll: async (page = 1, size = 10): Promise<PaginatedResponse> => {
+    const response = await axios.get(`${API_URL}/companies/`, {
+      params: {
+        page,
+        size
+      }
+    })
     return response.data
   },
 
   create: async (data: Company) => {
     try {
+      console.log('Sending company data:', data)
       const response = await axios.post(`${API_URL}/companies/`, data)
       return response.data
     } catch (error) {
@@ -48,5 +62,9 @@ export const companyService = {
       }
       throw error
     }
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await axios.delete(`${API_URL}/companies/${id}`)
   }
 }
