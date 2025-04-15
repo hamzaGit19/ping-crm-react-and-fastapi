@@ -22,6 +22,7 @@ class CompanyCreate(CompanyBase):
 class CompanyUpdate(CompanyBase):
     name: Optional[str] = None
     city: Optional[str] = None
+    updated_at: Optional[datetime] = None
 
 
 class Company(CompanyBase):

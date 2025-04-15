@@ -1,45 +1,69 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, func
 from typing import List, Optional
 from app.database import get_db
 from app.models import Company
 from app.schemas.company import CompanyCreate, CompanyUpdate, Company as CompanySchema
+from app.schemas.pagination import PaginatedResponse
+from datetime import datetime
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[CompanySchema])
+@router.get("/", response_model=PaginatedResponse[CompanySchema])
 async def list_companies(
     search: Optional[str] = None,
     city: Optional[str] = None,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=1, le=100),
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
+    # Build the base query
     query = select(Company)
 
+    # Apply filters
     if search:
         query = query.filter(Company.name.ilike(f"%{search}%"))
     if city:
         query = query.filter(Company.city.ilike(f"%{city}%"))
 
-    query = query.offset(skip).limit(limit)
+    # Get total count
+    count_query = select(func.count()).select_from(query)
+    total = db.execute(count_query).scalar()
+
+    # Apply pagination
+    offset = (page - 1) * size
+    query = query.offset(offset).limit(size)
+
+    # Execute query
     result = db.execute(query)
     companies = result.scalars().all()
-    return companies
+
+    # Return paginated response
+    return PaginatedResponse.create(items=companies, total=total, page=page, size=size)
 
 
 @router.post("/", response_model=CompanySchema)
 async def create_company(company: CompanyCreate, db: Session = Depends(get_db)):
-    db_company = Company(**company.model_dump())
-    db.add(db_company)
     try:
+        company_data = company.model_dump()
+        # Set both timestamps to current time
+        current_time = datetime.utcnow()
+        company_data["created_at"] = current_time
+        company_data["updated_at"] = current_time
+
+        print("Processed company data:", company_data)
+        db_company = Company(**company_data)
+        print("Created company instance:", db_company.__dict__)
+        db.add(db_company)
         db.commit()
         db.refresh(db_company)
         return db_company
     except Exception as e:
         db.rollback()
+        print("Error creating company:", str(e))
+        print("Error type:", type(e).__name__)
         raise HTTPException(status_code=400, detail=str(e))
 
 
