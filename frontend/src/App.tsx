@@ -1,14 +1,15 @@
-import { ChakraProvider } from '@chakra-ui/react'
-import { defaultSystem } from "@chakra-ui/react"
-import Header from "./components/Header";
+import { Routes, Route } from "react-router-dom"
+import MainLayout from "./components/layout/MainLayout"
+import Home from "./pages/Home"
 
 function App() {
-
   return (
-    <ChakraProvider value={defaultSystem}>
-      <Header />
-    </ChakraProvider>
+    <MainLayout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </MainLayout>
   )
 }
 
-export default App;
+export default App
