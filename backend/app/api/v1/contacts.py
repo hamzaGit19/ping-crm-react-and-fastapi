@@ -1,36 +1,42 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, func
 from typing import List, Optional
 from app.database import get_db
 from app.models import Contact
 from app.schemas.contact import ContactCreate, ContactUpdate, Contact as ContactSchema
+from app.schemas.common import PaginatedResponse
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ContactSchema])
-async def list_contacts(
-    search: Optional[str] = None,
-    city: Optional[str] = None,
-    company_id: Optional[int] = None,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=1, le=100),
+@router.get("/", response_model=PaginatedResponse[ContactSchema])
+def list_contacts(
     db: Session = Depends(get_db),
+    search: Optional[str] = None,
+    page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1, le=100),
 ):
     query = select(Contact)
 
     if search:
-        query = query.filter(Contact.name.ilike(f"%{search}%"))
-    if city:
-        query = query.filter(Contact.city.ilike(f"%{city}%"))
-    if company_id:
-        query = query.filter(Contact.company_id == company_id)
+        search_filter = (
+            Contact.first_name.ilike(f"%{search}%")
+            | Contact.last_name.ilike(f"%{search}%")
+            | Contact.email.ilike(f"%{search}%")
+        )
+        query = query.where(search_filter)
 
-    query = query.offset(skip).limit(limit)
-    result = db.execute(query)
-    contacts = result.scalars().all()
-    return contacts
+    # Calculate total and pages
+    total = db.scalar(select(func.count()).select_from(query.subquery()))
+    pages = (total + size - 1) // size
+
+    # Apply pagination
+    offset = (page - 1) * size
+    query = query.offset(offset).limit(size)
+
+    contacts = db.scalars(query).all()
+    return {"items": contacts, "total": total, "pages": pages}
 
 
 @router.post("/", response_model=ContactSchema)

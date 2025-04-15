@@ -64,7 +64,7 @@ class Contact(Base):
         DateTime(timezone=True), default=datetime.utcnow
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), onupdate=datetime.utcnow
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
     # Relationship
     company: Mapped[Optional["Company"]] = relationship(

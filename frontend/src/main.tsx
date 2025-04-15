@@ -7,7 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import theme from "./theme"
 import App from "./App"
 import CompanyList from "./pages/companies/CompanyList"
-
+import ContactList from "./pages/contacts/ContactList"
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "companies",
         element: <CompanyList />
+      },
+      {
+        path: "contacts",
+        element: <ContactList />
       }
     ]
   }

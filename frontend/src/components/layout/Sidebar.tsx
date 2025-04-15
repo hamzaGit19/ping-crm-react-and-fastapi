@@ -33,7 +33,7 @@ const Sidebar = () => {
           >
             Companies
           </ChakraLink>
-{/*
+
           <ChakraLink
             as={RouterLink}
             to="/contacts"
@@ -45,16 +45,6 @@ const Sidebar = () => {
             Contacts
           </ChakraLink>
 
-          <ChakraLink
-            as={RouterLink}
-            to="/reports"
-            py={2}
-            px={4}
-            _hover={{ bg: "whiteAlpha.200", textDecoration: 'none' }}
-            borderRadius="md"
-          >
-            Reports
-          </ChakraLink> */}
         </VStack>
       </Box>
     </Box>
