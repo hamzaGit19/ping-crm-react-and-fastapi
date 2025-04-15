@@ -25,7 +25,13 @@ class Company(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    email: Mapped[str] = mapped_column(String)
+    phone: Mapped[str] = mapped_column(String)
+    address: Mapped[str] = mapped_column(String)
     city: Mapped[str] = mapped_column(String)
+    province: Mapped[str] = mapped_column(String)
+    country: Mapped[str] = mapped_column(String)
+    postal_code: Mapped[str] = mapped_column(String)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
     )

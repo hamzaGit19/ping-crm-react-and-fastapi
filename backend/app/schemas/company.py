@@ -6,7 +6,13 @@ from .contact import Contact
 
 class CompanyBase(BaseModel):
     name: str
+    email: str
+    phone: str
+    address: str
     city: str
+    province: str
+    country: str
+    postal_code: str
 
 
 class CompanyCreate(CompanyBase):
