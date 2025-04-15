@@ -88,7 +88,7 @@ const CompanyModal = ({ isOpen, onClose, company, mode = 'create' }: CompanyModa
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bg="whitesmoke">
         <ModalHeader>{mode === 'edit' ? 'Edit' : 'Create New'} Company</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
@@ -96,7 +96,11 @@ const CompanyModal = ({ isOpen, onClose, company, mode = 'create' }: CompanyModa
             <VStack spacing={4}>
               <FormControl isInvalid={!!errors.name}>
                 <FormLabel>Company Name</FormLabel>
-                <Input {...register("name", { required: "Name is required" })} />
+                <Input
+                  {...register("name", { required: "Name is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.email}>
@@ -109,37 +113,63 @@ const CompanyModal = ({ isOpen, onClose, company, mode = 'create' }: CompanyModa
                       message: "Invalid email address"
                     }
                   })}
+                  bg="white"
+                  borderColor="gray.300"
                 />
               </FormControl>
 
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Phone</FormLabel>
-                <Input {...register("phone", { required: "Phone is required" })} />
+                <Input
+                  {...register("phone", { required: "Phone is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.address}>
                 <FormLabel>Address</FormLabel>
-                <Input {...register("address", { required: "Address is required" })} />
+                <Input
+                  {...register("address", { required: "Address is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.city}>
                 <FormLabel>City</FormLabel>
-                <Input {...register("city", { required: "City is required" })} />
+                <Input
+                  {...register("city", { required: "City is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.province}>
                 <FormLabel>Province/State</FormLabel>
-                <Input {...register("province", { required: "Province/State is required" })} />
+                <Input
+                  {...register("province", { required: "Province/State is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.country}>
                 <FormLabel>Country</FormLabel>
-                <Input {...register("country", { required: "Country is required" })} />
+                <Input
+                  {...register("country", { required: "Country is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <FormControl isInvalid={!!errors.postal_code}>
                 <FormLabel>Postal Code</FormLabel>
-                <Input {...register("postal_code", { required: "Postal code is required" })} />
+                <Input
+                  {...register("postal_code", { required: "Postal code is required" })}
+                  bg="white"
+                  borderColor="gray.300"
+                />
               </FormControl>
 
               <Button
