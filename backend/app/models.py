@@ -55,4 +55,6 @@ class Contact(Base):
         DateTime(timezone=True), onupdate=datetime.utcnow
     )
     # Relationship
-    company: Mapped["Company"] = relationship("Company", back_populates="contacts")
+    company: Mapped[Optional["Company"]] = relationship(
+        "Company", back_populates="contacts"
+    )

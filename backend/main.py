@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import select
 from app.database import get_db, engine, Base
 from app.models import User
-from app.api.v1 import contacts
+from app.api.v1 import contacts, companies
 
 # from sqlalchemy import text
 # from app.database import get_db
@@ -28,6 +28,7 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(contacts.router, prefix="/api/v1/contacts", tags=["contacts"])
+app.include_router(companies.router, prefix="/api/v1/companies", tags=["companies"])
 
 
 @app.get("/")
