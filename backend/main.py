@@ -1,5 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import select
+from app.database import get_db
+from app.models import User
+
+# from sqlalchemy import text
+# from app.database import get_db
 
 app = FastAPI(
     title="Ping CRM API",
@@ -25,3 +32,21 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+
+@app.get("/users")
+async def get_users(db: Session = Depends(get_db)):
+    query = select(User)
+    result = db.execute(query)
+    users = result.scalars().all()
+    return [
+        {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_active": user.is_active,
+            "created_at": user.created_at,
+            "updated_at": user.updated_at,
+        }
+        for user in users
+    ]
